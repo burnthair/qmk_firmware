@@ -2,6 +2,8 @@
     TODO general mac navigation
     TODO    open finder
     TODO    use mac keybindings to set to f13 - f22 for things that aren't working well?
+    TODO    close window
+    TODO    close program
     TODO vscode/text navigation
     TODO shortcuts to help documents, maybe displayed on ereader
 
