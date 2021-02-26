@@ -15,6 +15,9 @@
  */
 #include QMK_KEYBOARD_H
 
+#define _REAPER 0
+#define _MEDIA 1
+
 bool left_secondary = false;
 bool middle_secondary = false;
 bool right_secondary = false;
@@ -23,6 +26,7 @@ enum custom_keycodes {
     LEFT_ENC = SAFE_RANGE,
     RIGHT_ENC,
     MIDDLE_ENC,
+    SPOT,
 };
 
 enum encoder_names {
@@ -33,74 +37,79 @@ enum encoder_names {
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     /*
-      	| LAYOUT 0: REAPER
+        | LAYOUT 0: REAPER
         | Knob 1: Zoom X       | Knob 2: Zoom Y       | Knob 3: Horizontal Scroll |
         | Knob 1: Track Volume | Knob 2: Select Track | Knob 3: Vertical Scroll   |
-        | Home                 | F13                  | End                       |
-        | Toggle Layer 1       | Ctrl + r             | Spacebar                  |
+        | Toggle Layer 1       | Home                 | End                       |
+        | Arm Track (F13)      | Record (Ctrl + r)    | Play (Spacebar)           |
      */
-    [0] = LAYOUT(
-        LEFT_ENC, MIDDLE_ENC, RIGHT_ENC,
-        KC_HOME , KC_F13    , KC_END   ,
-        TO(1)   , LCTL(KC_R), KC_SPACE 
+    [_REAPER] = LAYOUT(
+        LEFT_ENC  , MIDDLE_ENC, RIGHT_ENC,
+        TO(_MEDIA), KC_HOME   , KC_END   ,
+        KC_F13    , LCTL(KC_R), KC_SPACE
     ),
     /*
-        | RESET          | N/A  | Media Stop |
-        | Held: Layer 2  | Home | RGB Mode   |
-        | Toggle Layer 0 | End  | Media Next |
+        TODO Knob 3 Volume
+        TODO Copy Song Link
+        TODO Open Spotify
+        TODO Play button opens iTunes instead of Spotify
+        | LAYOUT 1: Media
+        | N/A            | N/A                            | Knob 3: Volume |
+        | N/A            | N/A                            | Mute Volume    |
+        | Toggle Layer 0 | Copy Song Link (Cmd + Alt + C) | Open Spotify   |
+        | Media Previous | Media Play                     | Media Next     |
      */
-    [1] = LAYOUT(
-        RESET  , BL_STEP, KC_STOP,
-        _______, KC_HOME, RGB_MOD,
-        TO(0)  , KC_END , KC_MNXT
+    [_MEDIA] = LAYOUT(
+        _______    , _______         , KC_MUTE,
+        TO(_REAPER), LGUI(LALT(KC_C)), SPOT   ,
+        KC_MPRV    , KC_MPLY         , KC_MNXT
     ),
 };
 
 void encoder_update_user(uint8_t index, bool clockwise) {
-    if (index == _LEFT) {
-        if (clockwise) {
-            if (left_secondary) {
-                SEND_STRING(SS_LCTL(SS_TAP(X_UP)));
+    switch (index) {
+        case _LEFT:
+            if (clockwise) {
+                if (left_secondary) {
+                    SEND_STRING(SS_LCTL(SS_TAP(X_UP)));
+                } else {
+                    tap_code(KC_MS_WH_UP);
+                }
             } else {
-                tap_code(KC_MS_WH_UP);
+                if (left_secondary) {
+                    SEND_STRING(SS_LCTL(SS_TAP(X_DOWN)));
+                } else {
+                    tap_code(KC_MS_WH_DOWN);
+                }
             }
-        } else {
-            if (left_secondary) {
-                SEND_STRING(SS_LCTL(SS_TAP(X_DOWN)));
+        case _RIGHT:
+            if (clockwise) {
+                if (right_secondary) {
+                    SEND_STRING(SS_LCTL(SS_LALT(SS_TAP(X_MS_WH_UP))));
+                } else {
+                    SEND_STRING(SS_LALT(SS_TAP(X_MS_WH_UP)));
+                }
             } else {
-                tap_code(KC_MS_WH_DOWN);
+                if (right_secondary) {
+                    SEND_STRING(SS_LCTL(SS_LALT(SS_TAP(X_MS_WH_DOWN))));
+                } else {
+                    SEND_STRING(SS_LALT(SS_TAP(X_MS_WH_DOWN)));
+                }
             }
-        }
-    }
-    else if (index == _RIGHT) {
-        if (clockwise) {
-            if (right_secondary) {
-                SEND_STRING(SS_LCTL(SS_LALT(SS_TAP(X_MS_WH_UP))));
+        case _MIDDLE:
+            if (clockwise) {
+                if (middle_secondary) {
+                    SEND_STRING(SS_LCTL(SS_LALT(SS_TAP(X_DOWN))));
+                } else {
+                    SEND_STRING(SS_LCTL(SS_TAP(X_MS_WH_UP)));
+                }
             } else {
-                SEND_STRING(SS_LALT(SS_TAP(X_MS_WH_UP)));
+                if (middle_secondary) {
+                    SEND_STRING(SS_LCTL(SS_LALT(SS_TAP(X_UP))));
+                } else {
+                    SEND_STRING(SS_LCTL(SS_TAP(X_MS_WH_DOWN)));
+                }
             }
-        } else {
-            if (right_secondary) {
-                SEND_STRING(SS_LCTL(SS_LALT(SS_TAP(X_MS_WH_DOWN))));
-            } else {
-                SEND_STRING(SS_LALT(SS_TAP(X_MS_WH_DOWN)));
-            }
-        }
-    }
-    else if (index == _MIDDLE) {
-        if (clockwise) {
-            if (middle_secondary) {
-                SEND_STRING(SS_LCTL(SS_LALT(SS_TAP(X_DOWN))));
-            } else {
-                SEND_STRING(SS_LCTL(SS_TAP(X_MS_WH_UP)));
-            }
-        } else {
-            if (middle_secondary) {
-                SEND_STRING(SS_LCTL(SS_LALT(SS_TAP(X_UP))));
-            } else {
-                SEND_STRING(SS_LCTL(SS_TAP(X_MS_WH_DOWN)));
-            }
-        }
     }
 }
 
@@ -120,6 +129,13 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             if (record->event.pressed) {
                 middle_secondary = !middle_secondary;
             }
+            return false;
+        case SPOT:  // Open Spotify
+            SEND_STRING(SS_LGUI(SS_TAP(X_SPACE)));
+            _delay_ms(100);
+            SEND_STRING("spotify app");
+            _delay_ms(100);
+            SEND_STRING(SS_TAP(X_ENTER));
             return false;
         default:
             return true;
