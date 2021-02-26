@@ -1,15 +1,9 @@
-
-    /*
-        | OTHER LAYOUT IDEAS:
-        | OTHER LAYOUT IDEAS:
-        | vscode/text navigation
-        | shortcuts to help documents, maybe displayed on ereader
-        | alt tab
-        | cmd h
-        | chrome
-    */
-
-
+| OTHER LAYOUT IDEAS:
+    TODO general mac navigation
+    TODO    open finder
+    TODO    use mac keybindings to set to f13 - f22 for things that aren't working well?
+    TODO vscode/text navigation
+    TODO shortcuts to help documents, maybe displayed on ereader
 
 
 https://www.reddit.com/r/olkb/comments/bauj0t/can_you_change_encoders_output_using_layers_qmk/
