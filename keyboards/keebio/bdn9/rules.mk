@@ -1,2 +1,3 @@
 DEFAULT_FOLDER = keebio/bdn9/rev1
 ENCODER_ENABLE = yes
+MOUSEKEY_ENABLE = yes
