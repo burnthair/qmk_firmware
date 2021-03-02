@@ -84,7 +84,7 @@
     { LA1, LA2, LA3, LA4, LA5, LA6, LA7, LA8, LA9 }, \
     { LB1, LB2, LB3, LB4, LB5, LB6, LB7, LB8, KC_NO }, \
     { LC1, LC2, LC3, LC4, LC5, LC6, LC7, LC8, KC_NO }, \
-    { LD1, LD2, LD3, KC_NO, LD5, LD6, LD7, LD8, LD9 }, \
+    { LD1, LD2, LD3, LD4, LD5, LD6, LD7, LD8, LD9 }, \
     { LE1, LE2, LE3, LE4, LE5, LE6, KC_NO, LE8, KC_NO }, \
     { RA1, RA2, RA3, RA4, RA5, RA6, RA7, RA8, RA9 }, \
     { RB1, RB2, RB3, RB4, RB5, RB6, RB7, RB8, RB9 }, \
